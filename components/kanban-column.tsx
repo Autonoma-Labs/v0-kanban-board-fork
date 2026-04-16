@@ -1,7 +1,7 @@
 "use client"
 
 import { KanbanCard } from "./kanban-card"
-import type { Column, ColumnId } from "./kanban-board"
+import type { Column, ColumnId } from "@/lib/types"
 
 interface KanbanColumnProps {
   column: Column

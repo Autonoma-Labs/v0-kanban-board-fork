@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { Card, Priority } from "./kanban-board"
+import type { Card, Priority } from "@/lib/types"
 
 interface NewCardFormProps {
   onSubmit: (card: Omit<Card, "id">) => void

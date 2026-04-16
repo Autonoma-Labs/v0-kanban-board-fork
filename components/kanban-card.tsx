@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ArrowLeft, ArrowRight, MoreHorizontal, Trash2, User } from "lucide-react"
-import type { Card, ColumnId, Priority } from "./kanban-board"
+import type { Card, ColumnId, Priority } from "@/lib/types"
 
 interface KanbanCardProps {
   card: Card

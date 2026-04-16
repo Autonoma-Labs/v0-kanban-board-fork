@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useTransition, useState } from "react"
 import { KanbanColumn } from "./kanban-column"
 import { NewCardForm } from "./new-card-form"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { LogOut, Plus } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -12,76 +12,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { addTodo, moveTodo, deleteTodo } from "@/actions/todos"
+import { logout } from "@/actions/auth"
+import type { Card, Column, ColumnId, Priority } from "@/lib/types"
 
-export type Priority = "low" | "medium" | "high"
-export type ColumnId = "todo" | "in-progress" | "done"
+export type { Priority, ColumnId, Card, Column }
 
-export interface Card {
-  id: string
-  title: string
-  description: string
-  assignee: string
-  priority: Priority
+interface KanbanBoardProps {
+  initialColumns: Column[]
+  username: string
 }
 
-export interface Column {
-  id: ColumnId
-  title: string
-  cards: Card[]
-}
-
-const initialColumns: Column[] = [
-  {
-    id: "todo",
-    title: "To Do",
-    cards: [
-      {
-        id: "1",
-        title: "Research competitors",
-        description: "Analyze top 5 competitors and document findings",
-        assignee: "Sarah Chen",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Update documentation",
-        description: "Review and update API documentation for v2",
-        assignee: "Alex Kim",
-        priority: "low",
-      },
-    ],
-  },
-  {
-    id: "in-progress",
-    title: "In Progress",
-    cards: [
-      {
-        id: "3",
-        title: "Design system update",
-        description: "Implement new color palette across components",
-        assignee: "Jordan Lee",
-        priority: "medium",
-      },
-    ],
-  },
-  {
-    id: "done",
-    title: "Done",
-    cards: [
-      {
-        id: "4",
-        title: "User interviews",
-        description: "Completed 10 user interviews for feedback",
-        assignee: "Sarah Chen",
-        priority: "high",
-      },
-    ],
-  },
-]
-
-export function KanbanBoard() {
+export function KanbanBoard({ initialColumns, username }: KanbanBoardProps) {
   const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [, startTransition] = useTransition()
 
   const moveCard = (cardId: string, fromColumnId: ColumnId, toColumnId: ColumnId) => {
     if (fromColumnId === toColumnId) return
@@ -105,13 +50,13 @@ export function KanbanBoard() {
 
       return newColumns
     })
+
+    startTransition(() => moveTodo(cardId, toColumnId))
   }
 
   const addCard = (card: Omit<Card, "id">) => {
-    const newCard: Card = {
-      ...card,
-      id: Date.now().toString(),
-    }
+    const optimisticId = `optimistic-${Date.now()}`
+    const newCard: Card = { ...card, id: optimisticId }
 
     setColumns((prevColumns) =>
       prevColumns.map((col) =>
@@ -119,6 +64,15 @@ export function KanbanBoard() {
       )
     )
     setIsDialogOpen(false)
+
+    startTransition(() =>
+      addTodo({
+        title: card.title,
+        description: card.description,
+        assignee: card.assignee,
+        priority: card.priority as Priority,
+      })
+    )
   }
 
   const deleteCard = (cardId: string, columnId: ColumnId) => {
@@ -129,6 +83,8 @@ export function KanbanBoard() {
           : col
       )
     )
+
+    startTransition(() => deleteTodo(cardId))
   }
 
   return (
@@ -140,23 +96,31 @@ export function KanbanBoard() {
               Project Board
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Track and manage your tasks across different stages
+              Signed in as <span className="font-medium">{username}</span>
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                New Task
+          <div className="flex items-center gap-2">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  New Task
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Create New Task</DialogTitle>
+                </DialogHeader>
+                <NewCardForm onSubmit={addCard} onCancel={() => setIsDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+            <form action={logout}>
+              <Button type="submit" variant="outline" size="icon">
+                <LogOut className="h-4 w-4" />
+                <span className="sr-only">Log out</span>
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create New Task</DialogTitle>
-              </DialogHeader>
-              <NewCardForm onSubmit={addCard} onCancel={() => setIsDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
+            </form>
+          </div>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-3">
