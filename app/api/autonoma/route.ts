@@ -35,6 +35,7 @@ export const POST = createHandler({
   scopeField: "userId",
   sharedSecret: process.env.AUTONOMA_SHARED_SECRET!,
   signingSecret: process.env.AUTONOMA_SIGNING_SECRET!,
+  allowProduction: true,
   auth: async (user) => {
     if (!user?.id) return {};
     return { headers: { Cookie: `user_id=${user.id as string}` } };
