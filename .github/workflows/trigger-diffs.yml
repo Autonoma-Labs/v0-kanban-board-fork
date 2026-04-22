@@ -1,0 +1,23 @@
+name: Autonoma Trigger Diffs
+
+on:
+  deployment_status:
+
+permissions:
+  pull-requests: read
+
+jobs:
+  trigger-diffs:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Autonoma diff analysis
+        uses: Autonoma-AI/agent-actions/analyze-changes@main
+        with:
+          sha: ${{ github.event.deployment.sha }}
+          url: ${{ github.event.deployment_status.target_url }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          autonoma-api-key: ${{ secrets.AUTONOMA_API_KEY }}
+          autonoma-api-url: https://beta.agent.autonoma.app
+          environment: ${{ github.event.deployment_status.environment }}
+          webhook-url: ${{ github.event.deployment_status.target_url }}/api/autonoma
