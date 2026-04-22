@@ -87,6 +87,8 @@ export function KanbanBoard({ initialColumns, username }: KanbanBoardProps) {
     startTransition(() => deleteTodo(cardId))
   }
 
+  const totalTasks = columns.reduce((sum, col) => sum + col.cards.length, 0)
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
@@ -97,6 +99,8 @@ export function KanbanBoard({ initialColumns, username }: KanbanBoardProps) {
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Signed in as <span className="font-medium">{username}</span>
+              <span className="mx-2">&middot;</span>
+              <span data-testid="total-task-count">{totalTasks} {totalTasks === 1 ? "task" : "tasks"}</span>
             </p>
           </div>
           <div className="flex items-center gap-2">
