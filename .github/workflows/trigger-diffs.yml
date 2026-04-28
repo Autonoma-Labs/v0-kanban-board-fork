@@ -15,9 +15,10 @@ jobs:
         uses: Autonoma-AI/agent-actions/analyze-changes@main
         with:
           sha: ${{ github.event.deployment.sha }}
+          ref: ${{ github.event.deployment.ref }}
           url: ${{ github.event.deployment_status.target_url }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           autonoma-api-key: ${{ secrets.AUTONOMA_API_KEY }}
-          autonoma-api-url: https://alpha-efa151fd.alpha.agent.autonoma.app
+          autonoma-api-url: https://beta.agent.autonoma.app/
           environment: ${{ github.event.deployment_status.environment }}
           webhook-url: ${{ github.event.deployment_status.target_url }}/api/autonoma
