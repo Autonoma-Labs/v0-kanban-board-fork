@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { addTodo, moveTodo, deleteTodo } from "@/actions/todos"
+import { addTodo, deleteTodo } from "@/actions/todos"
 import { logout } from "@/actions/auth"
 import type { Card, Column, ColumnId, Priority } from "@/lib/types"
 
@@ -27,32 +27,6 @@ export function KanbanBoard({ initialColumns, username }: KanbanBoardProps) {
   const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [, startTransition] = useTransition()
-
-  const moveCard = (cardId: string, fromColumnId: ColumnId, toColumnId: ColumnId) => {
-    if (fromColumnId === toColumnId) return
-
-    setColumns((prevColumns) => {
-      const newColumns = prevColumns.map((col) => ({
-        ...col,
-        cards: [...col.cards],
-      }))
-
-      const fromColumn = newColumns.find((col) => col.id === fromColumnId)
-      const toColumn = newColumns.find((col) => col.id === toColumnId)
-
-      if (!fromColumn || !toColumn) return prevColumns
-
-      const cardIndex = fromColumn.cards.findIndex((card) => card.id === cardId)
-      if (cardIndex === -1) return prevColumns
-
-      const [card] = fromColumn.cards.splice(cardIndex, 1)
-      toColumn.cards.push(card)
-
-      return newColumns
-    })
-
-    startTransition(() => moveTodo(cardId, toColumnId))
-  }
 
   const addCard = (card: Omit<Card, "id">) => {
     const optimisticId = `optimistic-${Date.now()}`
@@ -128,7 +102,6 @@ export function KanbanBoard({ initialColumns, username }: KanbanBoardProps) {
             <KanbanColumn
               key={column.id}
               column={column}
-              onMoveCard={moveCard}
               onDeleteCard={deleteCard}
             />
           ))}

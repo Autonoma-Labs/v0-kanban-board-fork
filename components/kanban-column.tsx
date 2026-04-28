@@ -5,7 +5,6 @@ import type { Column, ColumnId } from "@/lib/types"
 
 interface KanbanColumnProps {
   column: Column
-  onMoveCard: (cardId: string, fromColumnId: ColumnId, toColumnId: ColumnId) => void
   onDeleteCard: (cardId: string, columnId: ColumnId) => void
 }
 
@@ -24,7 +23,7 @@ const columnStyles: Record<ColumnId, { dot: string; bg: string }> = {
   },
 }
 
-export function KanbanColumn({ column, onMoveCard, onDeleteCard }: KanbanColumnProps) {
+export function KanbanColumn({ column, onDeleteCard }: KanbanColumnProps) {
   const styles = columnStyles[column.id]
 
   return (
@@ -52,7 +51,6 @@ export function KanbanColumn({ column, onMoveCard, onDeleteCard }: KanbanColumnP
               key={card.id}
               card={card}
               columnId={column.id}
-              onMoveCard={onMoveCard}
               onDeleteCard={onDeleteCard}
             />
           ))
