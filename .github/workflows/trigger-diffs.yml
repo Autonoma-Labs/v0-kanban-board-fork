@@ -5,6 +5,7 @@ on:
 
 permissions:
   pull-requests: read
+  contents: read
 
 jobs:
   trigger-diffs:
@@ -18,6 +19,6 @@ jobs:
           url: ${{ github.event.deployment_status.target_url }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           autonoma-api-key: ${{ secrets.AUTONOMA_API_KEY }}
-          autonoma-api-url: https://beta.agent.autonoma.app
+          autonoma-api-url: https://alpha-efa151fd.alpha.agent.autonoma.app
           environment: ${{ github.event.deployment_status.environment }}
           webhook-url: ${{ github.event.deployment_status.target_url }}/api/autonoma
