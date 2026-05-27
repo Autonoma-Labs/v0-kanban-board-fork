@@ -96,7 +96,7 @@ export function KanbanBoard({ initialColumns, username }: KanbanBoardProps) {
               Project Board
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Signed in as <span className="font-medium">{username}</span>
+              Review tasks and priorities as <span className="font-medium">{username}</span>
             </p>
           </div>
           <div className="flex items-center gap-2">
